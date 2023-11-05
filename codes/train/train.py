@@ -82,17 +82,20 @@ if __name__ == "__main__":
     from data_loaders import cifarDataset
     from  torch.nn import CrossEntropyLoss
 
-
     from types import SimpleNamespace
     import yaml
-    from codes import config
-    from losses import  custom_EntropyLoss
+
+
+
+    with open('../train/config.yaml', 'r') as f:
+            config = SimpleNamespace(**yaml.safe_load(f))
+    from codes.train.losses import  custom_EntropyLoss
 
 
 
 
     callbacks = [MetricsCallback(input_key="targets", output_key="logits",
-                         directory=config.rootdir+config.weightdir, model_name=config.model_name)]
+                         directory=config.rootdir+config.weightdir, model_name=config.model_name,config=config)]
 
 
 

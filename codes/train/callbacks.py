@@ -10,7 +10,7 @@ from codes.utils.diagnostic import Diagonose
 from catalyst.dl  import  Callback, CallbackOrder,Runner
 import time
 from codes.utils.auxilary import count_parameters
-from codes import config
+
 class MetricsCallback(Callback):
 
     def __init__(self,
@@ -20,6 +20,7 @@ class MetricsCallback(Callback):
                  input_key: str = "targets",
                  output_key: str = "logits",
                  prefix: str = "acc_pre_rec_f1",
+                 config      =None,
 
                  ):
         super().__init__(CallbackOrder.Metric)
@@ -32,6 +33,7 @@ class MetricsCallback(Callback):
         self.check_interval = check_interval
 
         self.visualizer = Visualizer()
+        self.config=config
 
 
     def create_dist_data(self,dict):
@@ -142,10 +144,10 @@ class MetricsCallback(Callback):
         if state.epoch_step%100 == 0:
             time_passed=time.time()-self.start_time
             with open(self.directory+'summary.txt', 'w') as w:
-                w.write(config.model_name)
+                w.write(self.config.model_name)
                 w.write('\n')
                 w.write(self.table[0].get_string())
                 w.write(str(self.table[1]))
                 w.write('\n')
                 w.write('epoch{},Time_taken:{},val_classification_error:{},learning_rate:{}'
-                        .format(str(state.epoch_step),str(time_passed),str(met[1]),config.learning_rate))
+                        .format(str(state.epoch_step),str(time_passed),str(met[1]),self.config.learning_rate))
