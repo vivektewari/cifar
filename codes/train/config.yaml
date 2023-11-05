@@ -1,0 +1,120 @@
+
+
+name: null
+## WANDB params
+# The wandb project name
+project: cifar
+# The wandb user to log to
+entity: vivektewari2000
+# The wandb group for the run
+group: na
+
+## TRAINING params
+
+
+## MODEL params
+
+
+
+input_dim: [1,53,12,12]
+#model_params:
+#  channels : [1]
+#  input_image_dim : [12, 12]
+#  start_channel : 53
+#  convs : [3 ,3,3,3,2]
+#  pads : [0, 0,0,0,0]
+#  strides : [1,1, 1,1,1]
+#  pools : [2, 2,1,2,1] #receptive 6,
+#  fc1_p : [1,5761]
+model_params3:
+  channels : [25] #[50,50,50,25] #[100,100,50,50,50] [100,50,20]
+  input_image_dim : [12, 12]
+  start_channel : 53
+  convs : [2,2,2,2 ,2,3,2]
+  pads : [0, 0,0,0,0]
+  strides : [1,1, 1,1,1]
+  pools : [2, 2,1,2,1] #receptive 6,
+  fc1_p : [null,null]
+model_params1:
+  channels : [2] #[10,10]
+  input_image_dim : [11,11]
+  start_channel : 25 #20
+  convs : [2,2]
+  pads : [0, 0,0,0,0]
+  strides : [1,1, 1,1,1]
+  pools : [2, 2,1,2,1] #receptive 6,
+  fc1_p : [ 100,1]
+model_params2:
+  channels : [100] #[30,30,30]
+  input_image_dim : [11, 11]
+  start_channel : 25 #20
+  convs : [3,3,2]
+  pads : [0, 0,0,0,0]
+  strides : [1,1, 1,1,1]
+  pools : [2, 2,1,2,1] #receptive 6,
+  fc1_p : [ 1,5760]
+model_paramsrn1:
+  blocks: [4,4]
+  channels : [128,128,128]
+  input_image_dim : [12, 12]
+  start_channel : 53
+  convs : [3,3,3 ,3,3]
+  pads : [1, 1,1,1,1]
+  strides : [1,1, 1,1,1]
+  pools : [3, 3,3,3,3] #receptive 6,
+  fc1_p : [128,1]
+model_paramsrn2:
+  blocks: [4,4]
+  channels : [128,128,128]
+  input_image_dim : [12, 12]
+  start_channel : 53
+  convs : [3,3,3,3,3,3]
+  pads : [1, 1,1,1,1]
+  strides : [1,1, 1,1,1]
+  pools : [3, 3,3,3,3] #receptive 6,
+  fc1_p : [128,5760]
+model_paramsfc1:
+  input_node: 3072
+  layers: [100,50,10]
+model_paramsfc2:
+  input_nodes: 288
+  output_nodes: 5760
+model_exp:
+  channels: [ 10,10 ] #[10,10]
+  input_image_dim: [ 12,12 ]
+  start_channel: 53 #20
+  convs: [ 2,2 ]
+  pads: [ 0, 0,0,0,0 ]
+  strides: [ 1,1, 1,1,1 ]
+  pools: [ 1, 1,1,2,1 ] #receptive 6,
+  fc1_p: [ 100,1 ]
+  
+
+
+
+## OPTIMIZER params
+
+
+
+
+# MISCELLANEOUS params
+learning_rate: 0.01
+momentum: 0.99
+epsilon: 0.01
+alpha: 0.01
+actor_device: cuda:1
+learner_device: cuda:0
+model_log_freq: 100
+# file_descriptor or file_system
+
+
+model_name: fc_model #FeatureExtractor_baseline
+rootdir: /home/pooja/PycharmProjects/cifar/
+weightdir: /experiments/1/
+weight_decay: 0.01
+renderdir: /render/
+trackingdir: /tracking/
+data_loc: /data/cv_image/train/
+output: /1/
+pretrained: '/home/pooja/PycharmProjects/cifar/experiments/1/fc_model_300.pth'
+visdom_identifier: 'trial4' # 'c101_wd_0.01_ent_0.1'
