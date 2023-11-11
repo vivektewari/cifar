@@ -42,7 +42,7 @@ class ConvBlock(nn.Module):
 
 class FeatureExtractor_baseline(nn.Module):
     def __init__(self, start_channel=4, input_image_dim=(28, 28), channels=[2],
-                 convs=[4], strides=[1], pools=[2], pads=[1], fc1_p=[10, 10]):
+                 convs=[4], strides=[1], pools=[2], pads=[1], fc1_p=[10, 10],drop_out=0):
         super().__init__()
         self.num_blocks = len(channels)
         self.start_channel = start_channel
@@ -55,7 +55,7 @@ class FeatureExtractor_baseline(nn.Module):
         self.norms=nn.ModuleList()
 
 
-        self.dropout = nn.Dropout(0)
+        self.dropout = nn.Dropout(drop_out)
 
         last_channel = start_channel
         for i in range(self.num_blocks):

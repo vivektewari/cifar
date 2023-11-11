@@ -36,6 +36,7 @@ def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=N
 
     train_set=set(np.random.choice([i for i in range(train_len)],size=int(0.8*train_len),replace=False))
     valid_set=set([i for i in range(train_len)]).difference(train_set)
+    print("train samples:{}   valid samples:{}".format(len(train_set),len(valid_set)))
 
 
     loaders = {
@@ -94,10 +95,10 @@ if __name__ == "__main__":
 
 
 
-    callbacks = [MetricsCallback(input_key="targets", output_key="logits",
-                         directory=config.rootdir+config.weightdir, model_name=config.model_name,config=config)]
+    callbacks =[]# [MetricsCallback(input_key="targets", output_key="logits",
+                       #  directory=config.rootdir+config.weightdir, model_name=config.model_name,config=config)]
 
 
 
-    train(model_param=config.model_params1,model_=FeatureExtractor_baseline,data_loader_param=config.rootdir+config.data_loc,data_loader=cifarDataset,
+    train(model_param=config.model_params2,model_=FeatureExtractor_baseline,data_loader_param=config.rootdir+config.data_loc,data_loader=cifarDataset,
           loss_func=custom_EntropyLoss(),callbacks=callbacks,param=config)

@@ -7,7 +7,7 @@ import torch
 
 import numpy as np
 import os,cv2
-maxrows =1000000000000
+maxrows =100
 
 
 class cifarDataset(Dataset): # borrowed from riid challange work
@@ -20,6 +20,7 @@ class cifarDataset(Dataset): # borrowed from riid challange work
         self.images,self.labels=self.get_images(loc)
         if indexes is not None:
             self.images,self.labels=[self.images[i] for i in indexes],[self.labels[i] for i in indexes]
+        print("data len:{}   data mean:{}  data std:{}".format(len(self.images),torch.mean(torch.concat(self.images).flatten()),torch.std(torch.concat(self.images).flatten())))
 
 
 
