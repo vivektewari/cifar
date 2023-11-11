@@ -26,8 +26,13 @@ class Diagonose(object):
         w_dict,grad_dict={},{}
 
         for i in layers:
-            w_dict[i]=model.l[i].weight.detach().flatten()
-            grad_dict[i]=model.l[i].weight.grad.detach().flatten()
+            if hasattr(model.l[i], 'weight'):
+                w_dict[i]=model.l[i].weight.detach().flatten()
+                grad_dict[i]=model.l[i].weight.grad.detach().flatten()
+            else:
+                w_dict[i] = model.l[i].conv.weight.detach().flatten()
+                grad_dict[i] = model.l[i].conv.weight.grad.detach().flatten()
+
 
         return w_dict,grad_dict
 

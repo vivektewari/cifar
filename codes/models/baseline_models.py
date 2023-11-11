@@ -28,15 +28,15 @@ class ConvBlock(nn.Module):
         # self.bn1 = nn.BatchNorm2d(out_channels)
         # self.bn2 = nn.BatchNorm2d(out_channels)
 
-    def forward(self, input1, pool_size=None, pool_type='max'):
+    def forward(self, x, pool_size=None, pool_type='max'):
         if pool_size is None: pool_size = self.pool_size
-        x = input1
 
-        x = self.conv(input1)  # F.relu_(self.conv(input1))
+
+        x = self.conv(x)  # F.relu_(self.conv(input1))
         #
         #x = self.bn2(self.conv2(x))
-        # if pool_type == 'max':
-        #     x = F.max_pool2(x, kernel_size=pool_size)
+        if pool_type == 'max':
+             x = F.max_pool2d(x, kernel_size=pool_size)
         return x
 
 
@@ -46,33 +46,35 @@ class FeatureExtractor_baseline(nn.Module):
         super().__init__()
         self.num_blocks = len(channels)
         self.start_channel = start_channel
-        self.conv_blocks = nn.ModuleList()
+        self.l = nn.ModuleList()
         self.input_image_dim = tuple(input_image_dim)
         self.fc1_p = fc1_p
-        self.mode_train = 1
-        self.activation_l = torch.nn.ReLU() #torch.nn.LeakyReLU()
-        self.activation = torch.nn.Tanh() #torch.nn.Sigmoid()
+        self.mode_train = 0
+        self.a = torch.nn.ReLU()
+        self.a2=torch.nn.Softmax(dim=1)
+        self.norms=nn.ModuleList()
+
+
         self.dropout = nn.Dropout(0)
 
         last_channel = start_channel
         for i in range(self.num_blocks):
-            self.conv_blocks.append(ConvBlock(in_channels=last_channel, out_channels=channels[i],
+            self.l.append(ConvBlock(in_channels=last_channel, out_channels=channels[i],
                                               kernel_size=(convs[i], convs[i]), stride=(strides[i], strides[i]),
                                               pool_size=(pools[i], pools[i]), padding=pads[i]))
             last_channel = channels[i]
+            self.norms.append(torch.nn.BatchNorm2d(channels[i]))
 
         # getting dim of output of conv blo
         conv_dim = self.get_conv_output_dim()
-        if self.fc1_p[0] is not None:
-            self.fc1 = nn.Linear(conv_dim[0], fc1_p[0], bias=True)
-            self.fc2 = nn.Linear(fc1_p[0], fc1_p[1], bias=True)
-            if  False and self.fc1_p[1] is not None:
-                self.conv_blocks.append(ConvBlock(in_channels=last_channel, out_channels=fc1_p[1],
-                                                  kernel_size=(1, 1), stride=(1, 1),
-                                                  pool_size=(conv_dim[1][-2], conv_dim[1][-1]), padding=0))
-                self.num_blocks += 1
 
+
+        self.l.append( nn.Linear(conv_dim[0], fc1_p[0], bias=True))
+        self.norms.append(torch.nn.BatchNorm1d(fc1_p[0]))
+        self.l.append(nn.Linear(fc1_p[0], fc1_p[1], bias=True))
+        self.num_layers = self.num_blocks + 2
         self.init_weight()
+
         count_parameters(self)
 
     def get_conv_output_dim(self):
@@ -83,87 +85,56 @@ class FeatureExtractor_baseline(nn.Module):
 
     @staticmethod
     def init_layer(layer):
-        nn.init.xavier_uniform_(layer.weight )
+        if str(type(layer)).find('ConvBlock')>=0:
+            layer=layer.conv
+        nn.init.uniform(layer.weight )
         if hasattr(layer, "bias"):
             if layer.bias is not None:
                 layer.bias.data.fill_(0.)
 
     def init_weight(self):
-        for i in range(self.num_blocks):
-            self.init_layer(self.conv_blocks[i].conv)
+        for i in range(self.num_layers):
+            self.init_layer(self.l[i])
 
-        if self.fc1_p[0] is not None:
-            self.init_layer(self.fc1)
-            self.init_layer(self.fc2)
-        # init_layer(self.conv2)
-        # init_bn(self.bn1)
-        # init_bn(self.bn2)
-
-    def cnn_feature_extractor(self, x):
+    def cnn_feature_extractor(self, x,layer=None):
         # input 501*64
-        for i in range(self.num_blocks):
-            if torch.isnan(self.conv_blocks[i](x)).any():
-                j=0
-
-            x = self.conv_blocks[i](x)
-
-
-            # x_70=torch.quantile(x, 0.7)
-            # x_50 = torch.quantile(x, 1)
-            # x=self.activation_l((x-x_50-1)/max(x_50,0.01))
-            if i < (len(self.conv_blocks) - 1):
-                x = self.activation_l(x)
-                #print(torch.std(x),torch.min(x),torch.max(x))
-                # if torch.std(x)>0.0001:#fix: bad fix as valueue wer becoming nan
-                #      x = (x - torch.mean(x)) / torch.std(x)
-
-
+        if layer is not None:max_layer=min(self.num_blocks,layer+1)
+        else :max_layer=self.num_blocks
+        for i in range(max_layer):
+            x = self.l[i](x)
+            x = self.a(x)
+            x=self.norms[i](x)
             if self.mode_train == 1:
                 x = self.dropout(x)
-            # x=torch.clamp(x,100,-100)
+
+        return x
+    def pre_processing(self,x):
+        return x
+    def forward(self, x):
+        x=self.pre_processing(x)
+        x = self.cnn_feature_extractor(x)
+        x=x.flatten(start_dim=1)
+        x = self.a(self.l[self.num_layers-2](x))
+        x=self.norms[-1](x)
+        x = self.l[self.num_layers - 1](x)
+        x=self.post_processing(x)
+        return x
+
+    def post_processing(self, x):
+        return self.a2(x)
+    def run_till(self,x,layer):
+        x = self.pre_processing(x)
+        x = self.cnn_feature_extractor(x,layer)
+        x = x.flatten(start_dim=1)
+        if layer>(self.num_layers-2):
+            x = self.a(self.l[self.num_layers - 2](x))
+            x = self.norms[-1](x)
+        if layer > (self.num_layers - 1):
+            x = self.l[self.num_layers - 1](x)
 
         return x
 
-    def forward(self, input_):
-        #print(input_ [0,36,0,0])
 
-        x = input_ * 1.0
-
-        #x =torch.unflatten(x,2,(12,12))
-        #temp=torch.zeros(1,53,12,12)
-        #temp[0,36,0,0]=1
-        #x=x*temp
-        #todo remove below 2 lines
-        # x[0, 0:29, 0, 0] = x[0, 0:29, 0, 0] * 0.0
-        # x[0, 31:, 0, 0] = x[0, 31:, 0, 0] * 0.0
-
-        #x = input_/torch.max(input_)
-        x = self.cnn_feature_extractor(x)
-        #x=(x-torch.mean(x))/torch.std(x)
-        #print(1, torch.max(x))
-        #x=x+input_[:,:,:9,:9]#F.pad(x, (0,3,3,0,3,0), "constant", 0)F.pad(x, (3,0,3,0))
-        #print(2, torch.max(x),torch.max(input_[:,:,:9,:9]))
-        if self.fc1_p[0] is None and self.fc1_p[1] is None:
-            #x = x.flatten(start_dim=1, end_dim=-1)
-            return self.activation_l(x)
-        else:x = x.flatten(start_dim=1, end_dim=-1)
-
-
-        if self.fc1_p[0] is not None:
-
-            x = self.activation_l(x)
-
-            x = self.activation_l(self.fc1(x))
-            #print(3, torch.max(x))
-            # if max(x.shape)>1:
-            #      x = (x - torch.mean(x)) /torch.torch.std(x)
-            if self.mode_train == 1:
-                x = self.dropout(x)
-
-        if self.fc1_p[1] is not None:x = self.fc2(x)
-        else:x = x
-       # x=self.activation(x)
-        return torch.clip(x,-100,100).flatten()# F.tanh(x.flatten())
 
 
 class ResidualBlock(nn.Module):
@@ -189,6 +160,7 @@ class ResidualBlock(nn.Module):
         out += residual
         out = self.relu(out)
         return out
+
 
 
 class ResNet(nn.Module):

@@ -32,4 +32,5 @@ class custom_EntropyLoss(nn.Module):
         pred=torch.clamp(pred,0.0001,0.9999)
         loss= self.func(torch.log(pred),actual)
 
+
         return loss

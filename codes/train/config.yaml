@@ -36,14 +36,14 @@ model_params3:
   pools : [2, 2,1,2,1] #receptive 6,
   fc1_p : [null,null]
 model_params1:
-  channels : [2] #[10,10]
-  input_image_dim : [11,11]
-  start_channel : 25 #20
-  convs : [2,2]
+  channels : [200,100,100] #[10,10]
+  input_image_dim : [32,32]
+  start_channel : 3 #20
+  convs : [3,3,3,3,3,3]
   pads : [0, 0,0,0,0]
   strides : [1,1, 1,1,1]
-  pools : [2, 2,1,2,1] #receptive 6,
-  fc1_p : [ 100,1]
+  pools : [2, 2,2,2,1,1] #receptive 6,
+  fc1_p : [ 100,10]
 model_params2:
   channels : [100] #[30,30,30]
   input_image_dim : [11, 11]
@@ -75,7 +75,7 @@ model_paramsrn2:
   fc1_p : [128,5760]
 model_paramsfc1:
   input_node: 3072
-  layers: [100,50,10]
+  layers: [500,300,200,100,10]
 model_paramsfc2:
   input_nodes: 288
   output_nodes: 5760
@@ -100,10 +100,7 @@ model_exp:
 # MISCELLANEOUS params
 learning_rate: 0.01
 momentum: 0.99
-epsilon: 0.01
-alpha: 0.01
-actor_device: cuda:1
-learner_device: cuda:0
+
 model_log_freq: 100
 # file_descriptor or file_system
 
@@ -116,5 +113,5 @@ renderdir: /render/
 trackingdir: /tracking/
 data_loc: /data/cv_image/train/
 output: /1/
-pretrained: '/home/pooja/PycharmProjects/cifar/experiments/1/fc_model_300.pth'
+pretrained: '/home/pooja/PycharmProjects/cifar/experiments/1/fc_model_100.pth'
 visdom_identifier: 'trial4' # 'c101_wd_0.01_ent_0.1'

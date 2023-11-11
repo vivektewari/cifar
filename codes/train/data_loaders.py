@@ -7,7 +7,7 @@ import torch
 
 import numpy as np
 import os,cv2
-maxrows =100000000
+maxrows =10
 
 
 class cifarDataset(Dataset): # borrowed from riid challange work

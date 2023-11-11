@@ -67,7 +67,7 @@ def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=N
         loaders=loaders,
         optimizer=optimizer,
 
-        num_epochs=3000,
+        num_epochs=1000,
         verbose=True,
         logdir=f"fold0",
         callbacks=callbacks,
@@ -99,5 +99,5 @@ if __name__ == "__main__":
 
 
 
-    train(model_param=config.model_paramsfc1,model_=fc_model,data_loader_param=config.rootdir+config.data_loc,data_loader=cifarDataset,
+    train(model_param=config.model_params1,model_=FeatureExtractor_baseline,data_loader_param=config.rootdir+config.data_loc,data_loader=cifarDataset,
           loss_func=custom_EntropyLoss(),callbacks=callbacks,param=config)
