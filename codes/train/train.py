@@ -14,7 +14,7 @@ from sklearn.model_selection import StratifiedKFold
 import torch
 def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=None,param=None):
 
-    data_load = data_loader(data_loader_param)
+    data_load = data_loader(**data_loader_param)
     criterion = loss_func
     model = model_(**model_param)
     count_parameters(model)
@@ -38,15 +38,18 @@ def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=N
     valid_set=set([i for i in range(train_len)]).difference(train_set)
     print("train samples:{}   valid samples:{}".format(len(train_set),len(valid_set)))
 
+    data_loader_param['indexes']=list(train_set)
+    data_loader_param_v = data_loader_param
+    data_loader_param_v['indexes'] =  list(valid_set)
 
     loaders = {
-        "train": DataLoader(data_loader(data_loader_param, list(train_set)),
+        "train": DataLoader(data_loader(**data_loader_param ),
                             batch_size=2048,
                             shuffle=False,
                             num_workers=4,
                             pin_memory=True,
                             drop_last=False),
-        "valid": DataLoader(data_loader(data_loader_param, list(valid_set)),
+        "valid": DataLoader(data_loader(**data_loader_param),
                             batch_size=4096,
                             shuffle=False,
                             num_workers=4,
@@ -100,5 +103,5 @@ if __name__ == "__main__":
 
 
 
-    train(model_param=config.model_params2,model_=FeatureExtractor_baseline,data_loader_param=config.rootdir+config.data_loc,data_loader=cifarDataset,
+    train(model_param=config.model_params2,model_=FeatureExtractor_baseline,data_loader_param=config.data_loader_param,data_loader=cifarDataset,
           loss_func=custom_EntropyLoss(),callbacks=callbacks,param=config)

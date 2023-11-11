@@ -90,6 +90,9 @@ model_exp:
   strides: [ 1,1, 1,1,1 ]
   pools: [ 1, 1,1,2,1 ] #receptive 6,
   fc1_p: [ 100,1 ]
+data_loader_param:
+  loc: '/home/pooja/PycharmProjects/cifar/data/cv_image/train/'
+  max_rows: 100000000
   
 
 
@@ -113,7 +116,8 @@ weightdir: /experiments/1/
 weight_decay: 0.01
 renderdir: /render/
 trackingdir: /tracking/
-data_loc: /data/cv_image/train/
+
+
 output: /1/
 pretrained: null #'/home/pooja/PycharmProjects/cifar/weight/model. ,,,,,,,,,,,,,,,,,,,,,,,,,,,,                    nmn 1000.pth' #experiments/1/fc_model_100.pth'
 visdom_identifier: 'trial4' # 'c101_wd_0.01_ent_0.1'

@@ -7,16 +7,16 @@ import torch
 
 import numpy as np
 import os,cv2
-maxrows =100
+
 
 
 class cifarDataset(Dataset): # borrowed from riid challange work
-    def __init__(self,loc,indexes=None):  # HDKIM 100
+    def __init__(self,loc,indexes=None,max_rows =100000000):  # HDKIM 100
         super(cifarDataset).__init__()
         #loc='/home/pooja/PycharmProjects/lux_ai/outputs/inputs/'
 
 
-
+        self.max_rows=max_rows
         self.images,self.labels=self.get_images(loc)
         if indexes is not None:
             self.images,self.labels=[self.images[i] for i in indexes],[self.labels[i] for i in indexes]
@@ -38,7 +38,7 @@ class cifarDataset(Dataset): # borrowed from riid challange work
                 img.append(torch.tensor(image_data)/256.0)
                 lab.append(torch.tensor(int(label[0])))
                 count+=1
-                if count>maxrows:break
+                if count>self.max_rows:break
         return img,lab
 
 
