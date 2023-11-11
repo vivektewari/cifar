@@ -54,6 +54,7 @@ model_params2:
   pools: [ 2, 2,1,1,1,1,1 ] #receptive 6,
   fc1_p: [ 10,10 ]
   drop_out: 0.1
+  mode_train: 1
 model_paramsrn1:
   blocks: [4,4]
   channels : [128,128,128]

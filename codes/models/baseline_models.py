@@ -42,17 +42,18 @@ class ConvBlock(nn.Module):
 
 class FeatureExtractor_baseline(nn.Module):
     def __init__(self, start_channel=4, input_image_dim=(28, 28), channels=[2],
-                 convs=[4], strides=[1], pools=[2], pads=[1], fc1_p=[10, 10],drop_out=0):
+                 convs=[4], strides=[1], pools=[2], pads=[1], fc1_p=[10, 10],drop_out=0,mode_train=0):
         super().__init__()
         self.num_blocks = len(channels)
         self.start_channel = start_channel
         self.l = nn.ModuleList()
         self.input_image_dim = tuple(input_image_dim)
         self.fc1_p = fc1_p
-        self.mode_train = 0
+        self.mode_train = mode_train
         self.a = torch.nn.ReLU()
         self.a2=torch.nn.Softmax(dim=1)
         self.norms=nn.ModuleList()
+
 
 
         self.dropout = nn.Dropout(drop_out)
@@ -115,6 +116,8 @@ class FeatureExtractor_baseline(nn.Module):
         x = self.cnn_feature_extractor(x)
         x=x.flatten(start_dim=1)
         x = self.a(self.l[self.num_layers-2](x))
+        if self.mode_train == 1:
+            x = self.dropout(x)
         x=self.norms[-1](x)
         x = self.l[self.num_layers - 1](x)
         x=self.post_processing(x)
