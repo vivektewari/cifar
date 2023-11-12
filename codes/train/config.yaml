@@ -92,7 +92,11 @@ model_exp:
   fc1_p: [ 100,1 ]
 data_loader_param:
   loc: '/home/pooja/PycharmProjects/cifar/data/cv_image/train/'
-  max_rows: 100000000
+  max_rows: 5000
+
+data_loader_param_v:
+  loc: '/home/pooja/PycharmProjects/cifar/data/cv_image/test/'
+  max_rows: 5000
   
 
 
@@ -103,7 +107,7 @@ data_loader_param:
 
 
 # MISCELLANEOUS params
-learning_rate: 0.01
+learning_rate: 0.00
 momentum: 0.99
 
 model_log_freq: 100
@@ -119,5 +123,5 @@ trackingdir: /tracking/
 
 
 output: /1/
-pretrained: null #'/home/pooja/PycharmProjects/cifar/weight/model. ,,,,,,,,,,,,,,,,,,,,,,,,,,,,                    nmn 1000.pth' #experiments/1/fc_model_100.pth'
+pretrained: '/home/pooja/PycharmProjects/cifar/weight/model.2000.pth' #experiments/1/fc_model_100.pth'
 visdom_identifier: 'trial4' # 'c101_wd_0.01_ent_0.1'

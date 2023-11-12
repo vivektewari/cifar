@@ -23,9 +23,9 @@ for root, subdirs, files in os.walk(loc):
             #print('\t- subdirectory ' + subdir)
 
         for filename in files:
-            if filename.find("_batch")<0:continue
-            elif filename.find("test") <0: continue#dest_folder=save_loc+'/train/'
-            else :dest_folder=save_loc+'/test/'
+            if filename.find("data_batch")>=0:dest_folder=save_loc+'/train/'
+            elif filename.find("test") >=0: dest_folder=save_loc+'/test/'
+            else :continue #dest_folder=save_loc+'/test/'
             file_path = os.path.join(root, filename)
 
             print('\t- file %s (full path: %s)' % (filename, file_path))

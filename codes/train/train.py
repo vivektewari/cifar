@@ -12,7 +12,7 @@ from catalyst import dl
 #from callbacks import MetricsCallback
 from sklearn.model_selection import StratifiedKFold
 import torch
-def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=None,param=None):
+def train(model_param,model_,data_loader_param,data_loader_param_v=None,data_loader=None,loss_func=None,callbacks=None,param=None):
 
     data_load = data_loader(**data_loader_param)
     criterion = loss_func
@@ -31,25 +31,26 @@ def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=N
 
     # models.clear_rc_seq()
 
+    if data_loader_param_v is None:
+        train_len = data_load.__len__()
 
-    train_len = data_load.__len__()
+        train_set=set(np.random.choice([i for i in range(train_len)],size=int(0.8*train_len),replace=False))
+        valid_set=set([i for i in range(train_len)]).difference(train_set)
+        print("train samples:{}   valid samples:{}".format(len(train_set),len(valid_set)))
 
-    train_set=set(np.random.choice([i for i in range(train_len)],size=int(0.8*train_len),replace=False))
-    valid_set=set([i for i in range(train_len)]).difference(train_set)
-    print("train samples:{}   valid samples:{}".format(len(train_set),len(valid_set)))
+        data_loader_param['indexes']=list(train_set)
+        data_loader_param_v = data_loader_param
+        data_loader_param_v['indexes'] =  list(valid_set)
 
-    data_loader_param['indexes']=list(train_set)
-    data_loader_param_v = data_loader_param
-    data_loader_param_v['indexes'] =  list(valid_set)
 
     loaders = {
-        "train": DataLoader(data_loader(**data_loader_param ),
+        "train": DataLoader(data_loader(**data_loader_param),
                             batch_size=2048,
                             shuffle=False,
                             num_workers=4,
                             pin_memory=True,
                             drop_last=False),
-        "valid": DataLoader(data_loader(**data_loader_param),
+        "valid": DataLoader(data_loader(**data_loader_param_v),
                             batch_size=4096,
                             shuffle=False,
                             num_workers=4,
@@ -98,10 +99,11 @@ if __name__ == "__main__":
 
 
 
-    callbacks =[]# [MetricsCallback(input_key="targets", output_key="logits",
-                       #  directory=config.rootdir+config.weightdir, model_name=config.model_name,config=config)]
+    callbacks = [MetricsCallback(input_key="targets", output_key="logits",
+                         directory=config.rootdir+config.weightdir, model_name=config.model_name,config=config)]
 
 
 
-    train(model_param=config.model_params2,model_=FeatureExtractor_baseline,data_loader_param=config.data_loader_param,data_loader=cifarDataset,
+    train(model_param=config.model_params2,model_=FeatureExtractor_baseline,data_loader_param=config.data_loader_param
+          ,data_loader_param_v=config.data_loader_param_v,data_loader=cifarDataset,
           loss_func=custom_EntropyLoss(),callbacks=callbacks,param=config)

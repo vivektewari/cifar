@@ -88,7 +88,10 @@ class FeatureExtractor_baseline(nn.Module):
     def init_layer(layer):
         if str(type(layer)).find('ConvBlock')>=0:
             layer=layer.conv
-        nn.init.uniform(layer.weight )
+            nn.init.uniform(layer.weight )
+        else:
+            nn.init.xavier_uniform_(layer.weight)
+
         if hasattr(layer, "bias"):
             if layer.bias is not None:
                 layer.bias.data.fill_(0.)
@@ -107,6 +110,8 @@ class FeatureExtractor_baseline(nn.Module):
             x=self.norms[i](x)
             if self.mode_train == 1:
                 x = self.dropout(x)
+            else :
+                x = 0.9*x
 
         return x
     def pre_processing(self,x):
@@ -118,6 +123,8 @@ class FeatureExtractor_baseline(nn.Module):
         x = self.a(self.l[self.num_layers-2](x))
         if self.mode_train == 1:
             x = self.dropout(x)
+        else:
+            x = 0.9 * x
         x=self.norms[-1](x)
         x = self.l[self.num_layers - 1](x)
         x=self.post_processing(x)
