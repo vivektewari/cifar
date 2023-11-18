@@ -45,13 +45,13 @@ def train(model_param,model_,data_loader_param,data_loader_param_v=None,data_loa
 
     loaders = {
         "train": DataLoader(data_loader(**data_loader_param),
-                            batch_size=2048,
+                            batch_size=512,
                             shuffle=False,
                             num_workers=4,
                             pin_memory=True,
                             drop_last=False),
         "valid": DataLoader(data_loader(**data_loader_param_v),
-                            batch_size=4096,
+                            batch_size=512,
                             shuffle=False,
                             num_workers=4,
                             pin_memory=True,
@@ -104,6 +104,6 @@ if __name__ == "__main__":
 
 
 
-    train(model_param=config.model_params2,model_=FeatureExtractor_baseline,data_loader_param=config.data_loader_param
+    train(model_param=config.model_paramsrn1,model_=ResNet,data_loader_param=config.data_loader_param
           ,data_loader_param_v=config.data_loader_param_v,data_loader=cifarDataset,
           loss_func=custom_EntropyLoss(),callbacks=callbacks,param=config)

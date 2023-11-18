@@ -21,6 +21,7 @@ class MetricsCallback(Callback):
                  output_key: str = "logits",
                  prefix: str = "acc_pre_rec_f1",
                  config      =None,
+                 visulaizer=Visualizer()
 
                  ):
         super().__init__(CallbackOrder.Metric)
@@ -32,7 +33,7 @@ class MetricsCallback(Callback):
         self.model_name = model_name
         self.check_interval = check_interval
 
-        self.visualizer = Visualizer()
+        self.visualizer = visulaizer
         self.config=config
 
 
@@ -126,7 +127,8 @@ class MetricsCallback(Callback):
                 self.model_name + "_" + str(state.epoch_step) + ".pth")
             # pd.DataFrame(data={'targets':state.batch['targets'],'pred':state.batch['logits']},
             #              index=[i for i in range(len(state.batch['targets']))]).to_csv(self.directory+'pred_vs_actual'+str(state.epoch_step)+'.csv')
-
+        #print(state.batch['targets'])
+        #print(state.batch['logits'])
         if (state.epoch_step + 1) % self.check_interval == 0:
             met = self.getMetrics(state.batch['targets'], state.batch['logits'])
 

@@ -1,5 +1,5 @@
-
-
+import os
+import torchvision
 import numpy as np
 
 class Diagonose(object):
@@ -15,13 +15,49 @@ class Diagonose(object):
         layers=[0,int(np.floor(model.num_layers/2)),model.num_layers-1]
         if layers[1]==0:layers.remove(layers[1])
         return layers
+
     @staticmethod
-    def representation_info(model,layers,input):
+    def get_weight_image(model,loc):
+        layers_count=model.num_layers
+        if not os.path.exists(loc+'/weight_image/'):os.mkdir(loc+'/weight_image/')
+        for i in range(layers_count):
+           if str(type(model.l[i])).find('ConvBlock')>=0 :l=model.l[i].conv.weight
+           else: continue
+           for j in range(l.shape[0]):
+               block=l[j]
+               for k in range(block.shape[0]):
+                   channel=block[k]
+                   torchvision.utils.save_image((channel)/channel.std(), loc+'/weight_image/' + '{}_{}_{}.png'.format(i,j,k))
+
+    @staticmethod
+    def representation_info(model,layers,input,flatten=True):
         r_dict= {}
 
         for i in layers:
-            r_dict[i]= model.run_till(input,i).detach().flatten()
+            r_dict[i]= model.run_till(input,i).detach()
+            if flatten: r_dict[i] = r_dict[i].flatten()
         return r_dict
+
+    @classmethod
+    def representation_info_plots(cls,model,input,loc,notes):
+        if not os.path.exists(loc+'/layer_image/'):os.mkdir(loc + '/layer_image/')
+        layers=[i for i in range(model.num_layers)]
+
+        dict=cls.representation_info(model,layers,input,flatten=False)
+
+        for i in layers:
+
+
+            if len(dict[i][0].shape) < 2:
+                    channel=dict[i][0].reshape((1, dict[i][0].shape[0]))
+                    torchvision.utils.save_image((channel) / channel.std(),
+                                                 loc + 'layer_image/_{}_{}.png'.format(i, notes))
+            else:
+                for j in range(dict[i][0].shape[0]):
+                    channel=dict[i][0][j]
+                    #handling for dense net
+                    torchvision.utils.save_image((channel)/channel.std(), loc + 'layer_image/_{}_{}_{}.png'.format(i, j,notes))
+
     def weight_info(self,model,layers:list[int]) :#changes with choosen models toDo:change this to gnerelize ones
         w_dict,grad_dict={},{}
 

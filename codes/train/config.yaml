@@ -52,19 +52,31 @@ model_params2:
   pads: [ 0, 0,0,0,0,0,0,0,0 ]
   strides: [ 1,1, 1,1,1,1 ,1]
   pools: [ 2, 2,1,1,1,1,1 ] #receptive 6,
-  fc1_p: [ 10,10 ]
+  fc1_p: [ 100,10 ]
   drop_out: 0.1
-  mode_train: 1
+  mode_train: 0
+model_params5:
+  channels: [40,50,50,75,75,75,75] #[10,10]
+  input_image_dim: [ 32,32 ]
+  start_channel: 3 #20
+  convs: [ 3,3,3,3,3 ,3,3,3]
+  pads: [ 0, 0,0,0,0,0,0,0,0,0 ]
+  strides: [ 1,1, 1,1,1,1 ,1,1]
+  pools: [ 2, 1,1,1,1,1,1,1 ] #receptive 6,
+  fc1_p: [ 100,10 ]
+  drop_out: 0.1
+  mode_train: 0
 model_paramsrn1:
-  blocks: [4,4]
-  channels : [128,128,128]
-  input_image_dim : [12, 12]
-  start_channel : 53
+  blocks: [1,2,2,2]
+  channels : [64,64,128,256]
+  input_image_dim : [32, 32]
+  start_channel : 3
   convs : [3,3,3 ,3,3]
   pads : [1, 1,1,1,1]
   strides : [1,1, 1,1,1]
-  pools : [3, 3,3,3,3] #receptive 6,
-  fc1_p : [128,1]
+  fc1_p : [null,10]
+  mode_train: 0
+  drop_out: 0.1
 model_paramsrn2:
   blocks: [4,4]
   channels : [128,128,128]
@@ -92,11 +104,11 @@ model_exp:
   fc1_p: [ 100,1 ]
 data_loader_param:
   loc: '/home/pooja/PycharmProjects/cifar/data/cv_image/train/'
-  max_rows: 5000
+  max_rows: 100
 
 data_loader_param_v:
   loc: '/home/pooja/PycharmProjects/cifar/data/cv_image/test/'
-  max_rows: 5000
+  max_rows: 100
   
 
 
@@ -107,9 +119,9 @@ data_loader_param_v:
 
 
 # MISCELLANEOUS params
-learning_rate: 0.00
+learning_rate: 0.001
 momentum: 0.99
-
+weight_decay: 0.001
 model_log_freq: 100
 # file_descriptor or file_system
 
@@ -117,11 +129,11 @@ model_log_freq: 100
 model_name: fc_model #FeatureExtractor_baseline
 rootdir: /home/pooja/PycharmProjects/cifar/
 weightdir: /experiments/1/
-weight_decay: 0.01
+
 renderdir: /render/
 trackingdir: /tracking/
 
 
 output: /1/
-pretrained: '/home/pooja/PycharmProjects/cifar/weight/model.2000.pth' #experiments/1/fc_model_100.pth'
+pretrained: '/home/pooja/PycharmProjects/cifar/codes/train/fold0/checkpoints/model.0003.pth' # '/home/pooja/PycharmProjects/cifar/weight/model.last2.pth' #experiments/1/fc_model_100.pth'
 visdom_identifier: 'trial4' # 'c101_wd_0.01_ent_0.1'
