@@ -120,7 +120,7 @@ data_loader_param_v:
 
 # MISCELLANEOUS params
 learning_rate: 0.001
-momentum: 0.99
+momentum: 0.9
 weight_decay: 0.001
 model_log_freq: 100
 # file_descriptor or file_system
@@ -135,5 +135,5 @@ trackingdir: /tracking/
 
 
 output: /1/
-pretrained: '/home/pooja/PycharmProjects/cifar/codes/train/fold0/checkpoints/model.0003.pth' # '/home/pooja/PycharmProjects/cifar/weight/model.last2.pth' #experiments/1/fc_model_100.pth'
+pretrained: '/home/pooja/PycharmProjects/cifar/codes/train/fold0/checkpoints/model.0050.pth' # '/home/pooja/PycharmProjects/cifar/weight/model.last2.pth' #experiments/1/fc_model_100.pth'
 visdom_identifier: 'trial4' # 'c101_wd_0.01_ent_0.1'

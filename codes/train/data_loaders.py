@@ -21,6 +21,14 @@ class cifarDataset(Dataset): # borrowed from riid challange work
         if indexes is not None:
             self.images,self.labels,self.image_identifier=[self.images[i] for i in indexes],[self.labels[i] for i in indexes],[self.image_identifier[i] for i in indexes]
         print("data len:{}   data mean:{}  data std:{}".format(len(self.images),torch.mean(torch.concat(self.images).flatten()),torch.std(torch.concat(self.images).flatten())))
+        #normalizing data with mean =0.47 and std 0.25
+        mean,std=0.47,0.249
+        for i in range(len(self.images)):
+            self.images[i]=(self.images[i]-mean)/std
+        # print("data len:{}   data mean:{}  data std:{}".format(len(self.images),
+        #                                                        torch.mean(torch.concat(self.images).flatten()),
+        #                                                        torch.std(torch.concat(self.images).flatten())))
+
 
 
 

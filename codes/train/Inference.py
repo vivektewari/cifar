@@ -44,7 +44,7 @@ def get_inference(model,dataset,notes= ""):
                                  'pred':pred_ind,'prob':prob,'prob_act':prob_act, 'top_1':top_1,'top_3':top_3 })
         output=output.append(df)
         k = j
-        return output
+    return output
 
 
 if __name__ == "__main__":

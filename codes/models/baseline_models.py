@@ -254,6 +254,10 @@ class ResNet(nn.Module):
         x=self.norms[loop-1](x)
         x=self.a(x)
         x=self.avgpool(x).flatten(start_dim=1)
+        if self.mode_train == 1:
+            x = self.dropout(x)
+        else:
+            x = (1 - self.drop_out) * x
         x=self.l[loop](x)
         x=self.post_processing(x)
         return x
@@ -283,8 +287,7 @@ class ResNet(nn.Module):
                 # print(x[0, 0, 16, 16] )
                 x = x + residual
                 loop += 2
-                if self.mode_train == 1: x = self.dropout(x)
-                if loop>=layer:return x
+
 
         x = self.avgpool(x).flatten(start_dim=1)
         x = self.l[loop](x)
